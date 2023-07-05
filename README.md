@@ -1,4 +1,6 @@
 # Awesome Books
+![image](https://github.com/arnoldnekemiah/Awesome-Books/assets/42886828/83e1216d-f0b4-494c-b331-815b2850ff40)
+
 <a name="readme-top"></a>
 
 <div align="center">
