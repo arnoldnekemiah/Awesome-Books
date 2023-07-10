@@ -1,10 +1,6 @@
 class BookCollection {
-  constructor() {
-    this.books = [];
-  }
-
-  // Make sure if the local storage is empty, then add an empty array
-  getStoredBooks = () => {
+  // Make sure if the local storage in empty than add an empty array
+  static getStoredBooks() {
     if (localStorage.getItem('Added books') === null) {
       localStorage.setItem('Added books', JSON.stringify([]));
     }
@@ -12,59 +8,104 @@ class BookCollection {
   }
 
   // Store the books data into the local storage
-  updateStoredBooks = (books) => {
+  static updateStoredBooks(books) {
     localStorage.setItem('Added books', JSON.stringify(books));
   }
 
-  addNewBook(bookTitle, bookAuthor) {
+  static addNewBook(bookTitle, bookAuthor) {
+    const storedBooks = this.getStoredBooks();
     const newBook = {
       title: bookTitle,
       author: bookAuthor,
     };
-    this.books.push(newBook);
-    this.updateStoredBooks(this.books);
+    storedBooks.push(newBook);
+    this.updateStoredBooks(storedBooks);
+    this.displayBooks(storedBooks);
+  }
+
+  static removeBook(i) {
+    const storedBooks = this.getStoredBooks();
+    storedBooks.splice(i, 1);
+    this.updateStoredBooks(storedBooks);
     this.displayBooks();
   }
 
-  removeBook(i) {
-    this.books.splice(i, 1);
-    this.updateStoredBooks(this.books);
-    this.displayBooks();
-  }
-
-  createBookListHTML = (books) => {
+  static createBookListHTML(books) {
     let bookListHTML = '';
     for (let i = 0; i < books.length; i += 1) {
       const { title, author } = books[i];
       bookListHTML += `
-        <div class="booklist">
-          <p>"${title}" by "${author}"</p>
-          <button onClick="bookCollection.removeBook(${i})">Remove</button>
-        </div>
+      <div class= "booklist">
+      <p>"${title}" by "${author}"</p>
+      <button onClick="BookCollection.removeBook(${i})">Remove</button>
+      </div>
       `;
     }
     return bookListHTML;
-  };
+  }
 
   // Displaying the books on the UI from localStorage
-  displayBooks() {
+  static displayBooks() {
     const listOfBooks = document.querySelector('.container');
-    const bookListHTML = this.createBookListHTML(this.books);
+    const storedBooks = this.getStoredBooks();
+    const bookListHTML = this.createBookListHTML(storedBooks);
     listOfBooks.innerHTML = `
-      <ul class="book-ul">${bookListHTML}</ul>
-    `;
+        <ul class="book-ul">${bookListHTML}</ul>
+      `;
   }
 }
 
 // Get values from input fields
 const form = document.querySelector('form');
-const bookCollection = new BookCollection();
-
 form.addEventListener('submit', (e) => {
   const title = document.querySelector('.title');
   const author = document.querySelector('.author');
   e.preventDefault();
-  bookCollection.addNewBook(title.value, author.value);
+  BookCollection.addNewBook(title.value, author.value);
 });
 
-bookCollection.displayBooks();
+BookCollection.displayBooks();
+
+const date = new Date();
+document.getElementById('time').innerHTML = date;
+
+// Single page App implementation
+const pages = document.querySelectorAll('.nav-link');
+const booklist = document.querySelector('.book-section');
+const formSection = document.querySelector('.form-section');
+const contactSection = document.querySelector('.contact-container');
+const removeForm = document.querySelector('.kform');
+const heading = document.querySelector('.heading');
+
+// Show the form section by default
+formSection.classList.add('active');
+booklist.classList.add('non-active');
+contactSection.classList.add('non-active');
+removeForm.classList.add('non-active');
+
+pages.forEach((page) => {
+  page.addEventListener('click', (e) => {
+    booklist.classList.remove('active');
+    formSection.classList.remove('active');
+    contactSection.classList.remove('active');
+    removeForm.classList.remove('active');
+
+    if (e.target.classList.contains('booklist-2')) {
+      booklist.classList.add('active');
+      formSection.classList.remove('active');
+      removeForm.classList.add('non-active');
+    } else if (e.target.classList.contains('form-section')) {
+      formSection.classList.add('active');
+      booklist.classList.add('non-active');
+      contactSection.classList.add('non-active');
+      removeForm.classList.add('active');
+      heading.classList.add('non-active');
+    } else if (e.target.classList.contains('contact-section')) {
+      contactSection.classList.add('active');
+      booklist.classList.add('non-active');
+      formSection.classList.add('non-active');
+      removeForm.classList.add('non-active');
+      heading.classList.add('non-active');
+    }
+  });
+});
